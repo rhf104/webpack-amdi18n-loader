@@ -156,7 +156,6 @@ module.exports = function (content) {
 	for(let func of funcs) {
 		retStr = retStr.replace(func, JSON.parse(func));
 	}
-	
 
 	// this function would be exported
 	// and running in browser
@@ -182,12 +181,19 @@ module.exports = function (content) {
 			}
 		}
 
-		// fallback to root
-		for(var name in this.__root){
-			if(typeof this[name] === 'undefined'){
-				this[name] = this.__root[name];
-			}
-		}
+        var fallbackToRoot = function(root, result) {
+            if (root === 'undefined') {
+                return;
+            }
+            for (var name in root) {
+                if (typeof result[name] === 'undefined') {
+                    result[name] = root[name];
+                } else if (typeof result[name] === 'object') {
+                    fallbackToRoot(root[name], result[name]);
+                }
+            }
+        };
+		fallbackToRoot(this.__root, this);
 	};
 
 	// loader-related issue, nothing matters.
